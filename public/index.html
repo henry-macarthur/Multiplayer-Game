@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html lang = "en">
+  <head>
+    <title>My Game</title>
+    <meta charset = "UTF-8" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+  </head>
+  <body>
+
+    <h1>WELCOME TO MY GAME</h1>
+    <form>
+      <fieldset>
+        <legend>SIGN UP</legend>
+        <p>
+          <label>Name</label>
+          <input type = "text"
+                 id = "myText"
+                  />
+        </p>
+        <p>
+          <label>Password</label>
+          <input type = "password"
+                  id = "myPwd"
+                   />
+        </p>
+
+        <button id="myButton">Create</button>
+        <button id="loginbutton">Login</button>
+      </fieldset>
+    </form>
+
+
+
+    <canvas id="myCanvas" width="500" height="500" style = "border:1px solid #000000"></canvas>
+    <div id="videos" align="left">
+     <div id="subscriber"></div>
+     <div id="publisher"></div>
+ </div>
+ <script src="client.js"></script>
+  </body>
+
+
+</html>

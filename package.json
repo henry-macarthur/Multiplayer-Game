@@ -1,0 +1,28 @@
+{
+  "name": "game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "env-cmd ./config/dev.env nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.1",
+    "mongoose": "^5.6.4",
+    "needle": "^2.4.0",
+    "node-fetch": "^2.6.0",
+    "nodemon": "^1.19.1",
+    "request": "^2.88.0",
+    "socket.io": "^2.2.0",
+    "validator": "^11.1.0",
+    "verify": "^0.1.2"
+  },
+  "devDependencies": {
+    "env-cmd": "^8.0.2"
+  }
+}
