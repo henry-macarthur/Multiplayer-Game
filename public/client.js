@@ -1,5 +1,6 @@
 //console.log('running client');
-var socket = io.connect('http://localhost:2000')
+var socket = io.connect('https://henry-online-game.herokuapp.com/');
+//'http://localhost:2000')
 //////////LOGIN USER
 
 var apiKey = "46363672";
@@ -46,6 +47,7 @@ function initializeSession() {
     }
   });
 }
+//https://game-with-voicechat.herokuapp.com/
 
 const button = document.getElementById('myButton');
 button.addEventListener('click', function(e) {
@@ -108,7 +110,19 @@ loginButton.addEventListener('click', function(e) {
 
     return res.text();
   }).then((data) => {
+    //https://dashboard.heroku.com/apps/game-with-voicechat
+
       //initializeSession();
+      var SERVER_BASE_URL = 'https://dashboard.heroku.com/apps/game-with-voicechat';
+      fetch(SERVER_BASE_URL + '/session', {mode: 'no-cors'}).then(function(res) {
+        console.log('something')
+        return res.json()
+      }).then(function(res) {
+        apiKey = res.apiKey;
+        sessionId = res.sessionId;
+        token = res.token;
+        initializeSession();
+      }).catch(handleError);
       socket.emit('join', data);
       return false
   }).catch((e) => {
