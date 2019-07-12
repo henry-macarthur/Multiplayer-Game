@@ -100,6 +100,7 @@ loginButton.addEventListener('click', function(e) {
     },
     body: JSON.stringify(data)
   }).then((res) => {
+    console.log('login');
     //console.log('asdf')
     if(res.status === 404)
     {
