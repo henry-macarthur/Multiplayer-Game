@@ -3,9 +3,9 @@ var socket = io.connect('https://henry-online-game.herokuapp.com/');
 //'http://localhost:2000')
 //////////LOGIN USER
 
-var apiKey = "46363672";
-var sessionId = "2_MX40NjM2MzY3Mn5-MTU2Mjg4MTk3MDc3NH5aQnNWcTA4SS95VkZlbTdjNElyL1lTWTV-fg";
-var token = 'T1==cGFydG5lcl9pZD00NjM2MzY3MiZzaWc9YTljNDU0NzRlNzQzZTIyYzdhYmY3YzU1NzA4YjdkNmI5NGU5MTA3NjpzZXNzaW9uX2lkPTJfTVg0ME5qTTJNelkzTW41LU1UVTJNamc0TVRrM01EYzNOSDVhUW5OV2NUQTRTUzk1VmtabGJUZGpORWx5TDFsVFdUVi1mZyZjcmVhdGVfdGltZT0xNTYyODgxOTk5Jm5vbmNlPTAuOTgzOTE1MzUyMjYzMTU5MiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTYyODg1NTk5JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9';
+//var apiKey = "46363672";
+//var sessionId = "2_MX40NjM2MzY3Mn5-MTU2Mjg4MTk3MDc3NH5aQnNWcTA4SS95VkZlbTdjNElyL1lTWTV-fg";
+//var token = 'T1==cGFydG5lcl9pZD00NjM2MzY3MiZzaWc9YTljNDU0NzRlNzQzZTIyYzdhYmY3YzU1NzA4YjdkNmI5NGU5MTA3NjpzZXNzaW9uX2lkPTJfTVg0ME5qTTJNelkzTW41LU1UVTJNamc0TVRrM01EYzNOSDVhUW5OV2NUQTRTUzk1VmtabGJUZGpORWx5TDFsVFdUVi1mZyZjcmVhdGVfdGltZT0xNTYyODgxOTk5Jm5vbmNlPTAuOTgzOTE1MzUyMjYzMTU5MiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTYyODg1NTk5JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9';
 
 //initializeSession();
 // Handling all of our errors here by alerting them
@@ -100,7 +100,7 @@ loginButton.addEventListener('click', function(e) {
     },
     body: JSON.stringify(data)
   }).then((res) => {
-    console.log('login');
+    //console.log('login');
     //console.log('asdf')
     if(res.status === 404)
     {
@@ -114,20 +114,21 @@ loginButton.addEventListener('click', function(e) {
     //https://dashboard.heroku.com/apps/game-with-voicechat
 
       //initializeSession();
-      var SERVER_BASE_URL = 'https://dashboard.heroku.com/apps/game-with-voicechat';
-      fetch(SERVER_BASE_URL + '/session', {mode: 'no-cors'}).then(function(res) {
-        console.log('something')
+      var SERVER_BASE_URL = 'https://game-with-voicechat.herokuapp.com/';
+      fetch(SERVER_BASE_URL + '/session', {method: 'GET'}).then(function(res) {
+        //console.log(res)
         return res.json()
       }).then(function(res) {
         apiKey = res.apiKey;
         sessionId = res.sessionId;
         token = res.token;
+      //  console.log(apiKey + ' ' + sessionId + ' ' + token);
         initializeSession();
       }).catch(handleError);
       socket.emit('join', data);
       return false
   }).catch((e) => {
-
+    console.log(e)
   })
   //return false;
 })

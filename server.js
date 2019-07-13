@@ -355,7 +355,7 @@ Bullet.update = function()
 
 
 var server = app.listen(port, () => {
-  needle.patch('https://henry-online-game.herokuapp.com/users/logoutAll');//`http://localhost:${port}/users/logoutAll`);
+  needle.patch('https://henry-online-game.herokuapp.com/users/logoutAll');//`http://localhost:${port}/users/logoutAll`);//
   console.log('Server is running on port ' + port);
 });
 
@@ -395,7 +395,9 @@ io.on('connection', function(socket) {
 
         //console.log(update);
         //https://henry-online-game.herokuapp.com/
+        //`http://localhost:${port}/users/save/${name}`
         //http://localhost:${port}/users/save/${name}
+        //`https://henry-online-game.herokuapp.com/users/save/${name}`
         needle.patch(`https://henry-online-game.herokuapp.com/users/save/${name}`, update, {json: true}, function(err, resp) {
 
         });
