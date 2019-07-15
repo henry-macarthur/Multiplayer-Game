@@ -19,8 +19,9 @@ router.post('/users/signup', async (req, res) => {
 
 router.post('/users/login', async (req, res) => {
   try {
-    const user = await User.findUser(req.body.name, req.body.password);
 
+    const user = await User.findUser(req.body.name, req.body.password);
+    //console.log(user);
     if(user.loggedIn)
       throw new Error();
     user.loggedIn = true;

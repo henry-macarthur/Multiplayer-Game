@@ -26,8 +26,129 @@ let ID_MAP = {};
 var initPack = {player: [], bullet: []};
 var removePack = {player: [], bullet:[]};
 let COLORS = ["#BB8FCE", "#3498DB", "#D35400", "#CB4335", "#0E6655", "#D4AC0D", "#C39BD3", "#E74C3C", "#9C640C"];
+let LOCATIONS = [{x: 30, y: 30, i: 0}, {x: 350, y: 350, i: 0}, {x: 470, y: 100, i: 0}, {x: 700, y: 50, i:1}, {x: 700, y: 250, i: 0}, {x: 100, y: 360, i: 0}, {x: 620, y: 430, i: 1}, {x: 200, y: 250, i: 1}]; //6
 //let PLAYERS = {};
 
+// var rand () = > {
+//   let m
+// }
+
+class Powerup
+{
+  constructor(type)
+  {
+    this.color;
+    switch(type)
+    {
+      case 'shotgun':
+      {
+        this.color = 'red';
+        this.x = 700;
+        this.y = 50;
+        break;
+      }
+      case 'rapid':
+      {
+        this.color = 'blue';
+        this.x = 620;
+        this.y = 430;
+        break;
+      }
+      case 'damage':
+      {
+        this.color = 'green'
+        this.x = 200;
+        this.y = 250;
+        break;
+      }
+    }
+    //let location = LOCATIONS[Math.floor(Math.random()*5)];
+    this.visible = true;
+    this.type = type;
+    this.time;
+    this.i;
+  }
+
+  updateLocation(x, y)
+  {
+    this.x = x;
+    this.y = y;
+  }
+
+  getDistance(x, y)
+  {
+    return Math.sqrt(Math.pow(x -this.x, 2) + Math.pow(y - this.y, 2));
+  }
+
+  update()
+  {
+    for(var i in Player.list)
+    {
+      //console.log(this.getDistance(Player.list[i].x, Player.list[i].y))
+      if(this.getDistance(Player.list[i].x+ 12, Player.list[i].y + 12) < 25 && Player.list[i].powerup === 'none')
+      {
+        Player.list[i].powerup = this.type;
+        Player.list[i].powerupTime = Date.now();
+        this.visible = false;
+        this.time = Date.now();
+      //
+        var i = Math.floor(Math.random() * 7);
+        let location = LOCATIONS[i];
+        while(location.i == 1)
+        {
+          i = Math.floor(Math.random() * 7)
+          location = LOCATIONS[i];
+        }
+        LOCATIONS[i].i = 1;
+
+        for(let i = 0; i < LOCATIONS.length; i++)
+        {
+          if(LOCATIONS[i].x == this.x && LOCATIONS[i].y == this.y)
+            LOCATIONS[i].i == 0;
+        }
+
+        this.updateLocation(location.x, location.y);
+      //  delete LOCATIONS[location.i];
+      }
+
+      if(!this.visible && ((Date.now() - this.time) >= 2000))
+      {
+        console.log('respawn')
+        this.visible = true;
+      }
+    }
+  }
+
+  getUpdatePack()
+  {
+    return {
+      x: this.x,
+      y: this.y,
+      color: this.color,
+      visible: this.visible
+    }
+  }
+
+
+}
+
+Powerup.list = [new Powerup('shotgun'), new Powerup('rapid'), new Powerup('damage')];
+
+Powerup.update = function()
+{
+  var package = [];
+  for(var i in Powerup.list)
+  {
+    let powerup = Powerup.list[i];
+    // player.x++;
+    // player.y++;
+    powerup.update();
+    //console.log(socket.color);
+    package.push(powerup.getUpdatePack());
+  }
+
+  return package;
+}
 
 
 var createEntity = function(x, y) {
@@ -56,7 +177,7 @@ var createEntity = function(x, y) {
 
   return self
 }
-var Player = function (id, x, y, hp, score)
+var Player = function (id, x, y, hp, score, name)
 {
   var data = createEntity(x, y);
   data.id = id;
@@ -64,6 +185,7 @@ var Player = function (id, x, y, hp, score)
   data.up = false,
   data.down = false,
   data.left = false,
+  data.name = name,
   data.right = false,
   data.attack = false,
   data.mouseAngle = 0;
@@ -71,6 +193,9 @@ var Player = function (id, x, y, hp, score)
   data.canShoot = true;
   data.lastShot = 0;
   data.reloadTime = 200;
+  data.powerup = 'none';
+  data.powerupTime;
+  data.addDmg = 0;
   //console.log(hp);
   data.hp = hp;
   data.fullhp = 100;
@@ -82,16 +207,6 @@ var Player = function (id, x, y, hp, score)
 
     for(let i = 0; i < Wall.list.length; i++)
     {
-      // let xx = data.x;
-      // let yy = data.y;
-      // if(data.left === true)
-      //   xx = data.x
-      // if(data.right === true)
-      //   xx = data.x + 20;
-      // if(data.up === true)
-      //   yy = data.y
-      // if(data.down === true)
-      //   yy = data.y + 20;
 
       if(Wall.list[i].collide(data.x, data.y))
       {
@@ -106,11 +221,63 @@ var Player = function (id, x, y, hp, score)
       }
     }
 
+    if(data.powerup != 'none')
+    {
+    //  console.log(Date.now() - data.powerupTime)
+
+      switch (data.powerup)
+      {
+        case 'shotgun':
+        {
+          data.reloadTime = 350;
+          break;
+        }
+        case 'damage':
+        {
+          data.addDmg = 15
+          data.reloadTime = 450;
+          //console.log('damage')
+          break;
+        }
+        case 'rapid':
+        {
+          data.reloadTime = 800;
+          break;
+        }
+      }
+
+      if((Date.now() - data.powerupTime) > 7000)
+      {
+      //  console.log('ok')
+        data.powerup = 'none';
+        data.reloadTime = 200;
+        data.addDmg = 0;
+      }
+    }
+
     if(data.canShoot === false && (Date.now() - data.lastShot) > data.reloadTime)
       data.canShoot = true;
     if(data.attack && data.canShoot)
     {
-      data.shootBullet(data.mouseAngle);
+      console.log(data.powerup)
+      if(data.powerup === 'shotgun')
+      {
+        data.shootBullet(data.mouseAngle);
+        data.shootBullet(data.mouseAngle+20);
+        data.shootBullet(data.mouseAngle-20);
+      }
+      else
+        data.shootBullet(data.mouseAngle);
+
+      for(var i in SOCKET_LIST)
+      {
+        let s = SOCKET_LIST[i];
+        s.emit('init', {
+          player: Player.getSignIn(),
+          bullet: Bullet.getSignIn()
+        })
+      }
+
       data.canShoot = false;
       data.lastShot = Date.now();
     }
@@ -145,7 +312,8 @@ var Player = function (id, x, y, hp, score)
       hp: data.hp,
       hpMax: data.fullhp,
       score: data.score,
-      color: data.color
+      color: data.color,
+      name: name
     }
   }
 
@@ -157,6 +325,7 @@ var Player = function (id, x, y, hp, score)
       score: data.score,
       hp: data.hp,
       y: data.y,
+      name: name
     }
   }
   Player.list[id] = data;
@@ -167,10 +336,10 @@ var Player = function (id, x, y, hp, score)
 
 Player.list = {};
 
-Player.onConnect = function(socket, x, y, hp, score)
+Player.onConnect = function(socket, x, y, hp, score, name)
 {
   //console.log(score)
-  var currentPlayer = Player(socket.id, x, y, hp, score);
+  var currentPlayer = Player(socket.id, x, y, hp, score, name);
   socket.on('keyPress', (data) => {
     //console.log('dsadf')
     if(data.input === 'left')
@@ -195,11 +364,14 @@ Player.onConnect = function(socket, x, y, hp, score)
     }
   });
 
-
-  socket.emit('init', {
+for(var i in SOCKET_LIST)
+{
+  let s = SOCKET_LIST[i];
+  s.emit('init', {
     player: Player.getSignIn(),
     bullet: Bullet.getSignIn()
   })
+}
 }
 
 Player.getSignIn = function() {
@@ -214,8 +386,10 @@ Player.getSignIn = function() {
 }
 
 Player.onDisconnect = function(socket) {
+  console.log(Player.list)
   delete Player.list[socket.id];
   removePack.player.push(socket.id);
+
 }
 
 Player.update = function()
@@ -258,9 +432,11 @@ var Bullet = function(parent, angle)
     {
       var p = Player.list[i];
       //hit and its hitting a different player
+      //console.log(p.addDmg)
       if(self.getDistance(p) < 30 && self.parent.id !== p.id)
       {
-        p.hp -= self.dmg;;
+
+        p.hp -= (self.dmg + parent.addDmg);
         var shooter = Player.list[self.parent.id]
 
         if(p.hp <= 0)
@@ -313,6 +489,7 @@ Bullet.getSignIn = function ()
     bullets.push(Bullet.list[i].getInitPack())
   }
 
+
   return bullets;
 }
 
@@ -355,7 +532,7 @@ Bullet.update = function()
 
 
 var server = app.listen(port, () => {
-  needle.patch('https://henry-online-game.herokuapp.com/users/logoutAll');//`http://localhost:${port}/users/logoutAll`);//
+  needle.patch('https://henry-online-game.herokuapp.com/users/logoutAll');//`http://localhost:${port}/users/logoutAll`
   console.log('Server is running on port ' + port);
 });
 
@@ -366,6 +543,7 @@ io.on('connection', function(socket) {
 
   socket.on('join',function (data){
       socket.id = Math.random();//data._id;
+      socket.name = data.name;
       data = JSON.parse(data);
       //console.log(data);
       let name = data.name;
@@ -374,17 +552,19 @@ io.on('connection', function(socket) {
       // socket.y = 50;
       // socket.color = COLORS[Math.floor(Math.random() * 9)];
       ////var currentPlayer = Player(socket.id, data.x, data.y);
-      console.log(Wall.list);
+      //console.log(Wall.list);
       socket.emit('walls', Wall.list);
+      socket.emit('powerups', Powerup.update());
       SOCKET_LIST[socket.id] = socket;
       ID_MAP[socket.id] = data._id;
-      Player.onConnect(socket, data.x, data.y, data.hp, data.score)
+      Player.onConnect(socket, data.x, data.y, data.hp, data.score, data.name)
       //PLAYERS[socket.id] = currentPlayer;
       //SOCKET_LIST[data._id]
       //console.log(SOCKET_LIST.length);
-      socket.emit
+      //socket.emit
 
       socket.on('disconnect', function() {
+
         var update = {
           x: Player.list[socket.id].x,
           y: Player.list[socket.id].y,
@@ -392,7 +572,8 @@ io.on('connection', function(socket) {
           hp: Player.list[socket.id].hp,
           loggedIn: false
         }
-
+        //console.log('dis')
+        Player.onDisconnect(socket)
         //console.log(update);
         //https://henry-online-game.herokuapp.com/
         //`http://localhost:${port}/users/save/${name}`
@@ -402,12 +583,22 @@ io.on('connection', function(socket) {
 
         });
 
+        for(var i in SOCKET_LIST)
+        { //emit pack to each socket;
+          //console.log(i);
+          let socket = SOCKET_LIST[i];
+          // if(removePack.player.length !== 0)
+          //  console.log(removePack)
+          socket.emit('remove', removePack);
+        }
+        removePack.player = [];
+        removePack.bullet = [];
 
         //instead i think i need to make a socket.io call to do this on the front end
 
         delete ID_MAP[socket.id];
         delete SOCKET_LIST[socket.id];
-        Player.onDisconnect(socket)
+
 
 
 
@@ -421,19 +612,26 @@ setInterval(function() {
     player: Player.update(),
     bullet: Bullet.update(),
   }
+
+  //console.log(package)
  //
+ //console.log(SOCKET_LIST)
  //  if(package.player.length !== 0)
  //  {
  //    //console.log(initPack.player.length)
  //   console.log(package);
  // }
 
+
   for(var i in SOCKET_LIST)
   { //emit pack to each socket;
     //console.log(i);
     let socket = SOCKET_LIST[i];
     socket.emit('update', package)
-    socket.emit('init', initPack)
+    //socket.emit('init', initPack)
+    // if(removePack.player.length !== 0)
+    //  console.log(removePack)
+    socket.emit('updatePowerUp', Powerup.update());
     socket.emit('remove', removePack);
   }
   initPack.player = [];

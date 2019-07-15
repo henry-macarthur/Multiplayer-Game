@@ -1,6 +1,77 @@
 <!DOCTYPE HTML>
 <html lang = "en">
   <head>
+    <style>
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.ScoreElement {
+
+  background-color: white;
+}
+
+.button2 {
+  background-color: #008CBA;
+  color: white;
+    border: 2px solid #008CBA;
+}
+
+.button2:hover {
+  background-color: white;
+  color: black;
+  border: 2px solid #008CBA;
+
+}
+
+.form2 {
+  background-color: #f0f0f5;
+}
+
+#gameDiv {
+  display: inline-block;
+  width: 1500px;
+  height: 500px;
+  background-color: white
+}
+
+#scoreBoard {
+   vertical-align: top;
+   align: left;
+  display: inline-block;
+  background-color: white;
+  border: 2px solid black;
+  width: 150px;
+  height: 500px;
+  padding-top: -100px;
+}
+
+input[type=text] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 2px solid #008CBA;
+  border-radius: 4px;
+}
+
+h1 {
+  text-align: center;
+  font-family:Tahoma, Geneva, sans-serif
+}
+
+</style>
     <title>My Game</title>
     <meta charset = "UTF-8" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
@@ -9,9 +80,10 @@
   <body>
 
     <h1>WELCOME TO MY GAME</h1>
-    <form>
+    <div id = "signInDiv">
+    <form class = "form2">
       <fieldset>
-        <legend>SIGN UP</legend>
+
         <p>
           <label>Name</label>
           <input type = "text"
@@ -20,23 +92,26 @@
         </p>
         <p>
           <label>Password</label>
-          <input type = "password"
+          <input type = "text"
                   id = "myPwd"
                    />
         </p>
 
-        <button id="myButton">Create</button>
-        <button id="loginbutton">Login</button>
+        <button class="button button2" id="myButton">Create</button>
+        <button class="button button2" id="loginbutton">Login</button>
       </fieldset>
     </form>
+    </div>
 
-
-
+<div id = "gameDiv" style = "display:none;">
     <canvas id="myCanvas" width="500" height="500" style = "border:1px solid #000000"></canvas>
+    <div id="scoreBoard"> </div>
+
     <div id="videos" align="left">
      <div id="subscriber"></div>
      <div id="publisher"></div>
- </div>
+   </div>
+</div>
  <script src="client.js"></script>
   </body>
 

@@ -1,12 +1,18 @@
 //console.log('running client');
+//'localhost:2000'
 var socket = io.connect('https://henry-online-game.herokuapp.com/');
 //'http://localhost:2000')
 //////////LOGIN USER
 
+//console.log('afaf')
+
+
+//
+ //console.log(sD);
 //var apiKey = "46363672";
 //var sessionId = "2_MX40NjM2MzY3Mn5-MTU2Mjg4MTk3MDc3NH5aQnNWcTA4SS95VkZlbTdjNElyL1lTWTV-fg";
 //var token = 'T1==cGFydG5lcl9pZD00NjM2MzY3MiZzaWc9YTljNDU0NzRlNzQzZTIyYzdhYmY3YzU1NzA4YjdkNmI5NGU5MTA3NjpzZXNzaW9uX2lkPTJfTVg0ME5qTTJNelkzTW41LU1UVTJNamc0TVRrM01EYzNOSDVhUW5OV2NUQTRTUzk1VmtabGJUZGpORWx5TDFsVFdUVi1mZyZjcmVhdGVfdGltZT0xNTYyODgxOTk5Jm5vbmNlPTAuOTgzOTE1MzUyMjYzMTU5MiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTYyODg1NTk5JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9';
-
+  //console.log('ok')
 //initializeSession();
 // Handling all of our errors here by alerting them
 function handleError(error) {
@@ -51,6 +57,7 @@ function initializeSession() {
 
 const button = document.getElementById('myButton');
 button.addEventListener('click', function(e) {
+  e.preventDefault();
   let name = document.getElementById('myText').value;
   let password = document.getElementById('myPwd').value;
 
@@ -81,6 +88,9 @@ button.addEventListener('click', function(e) {
 
 });
 
+var signDiv = document.getElementById('signInDiv');
+var gameDiv = document.getElementById('gameDiv');
+
 const loginButton = document.getElementById('loginbutton');
 loginButton.addEventListener('click', function(e) {
   e.preventDefault();
@@ -100,6 +110,7 @@ loginButton.addEventListener('click', function(e) {
     },
     body: JSON.stringify(data)
   }).then((res) => {
+    //console.log(gameDiv)
     //console.log('login');
     //console.log('asdf')
     if(res.status === 404)
@@ -111,9 +122,14 @@ loginButton.addEventListener('click', function(e) {
 
     return res.text();
   }).then((data) => {
+
+      signDiv.style.display = 'none';
+      gameDiv.style.display = 'inline-block';
+    //  console.log(gameDiv);
     //https://dashboard.heroku.com/apps/game-with-voicechat
 
-      //initializeSession();
+    //  initializeSession();
+      console.log('inits')
       var SERVER_BASE_URL = 'https://game-with-voicechat.herokuapp.com/';
       fetch(SERVER_BASE_URL + '/session', {method: 'GET'}).then(function(res) {
         //console.log(res)
@@ -125,10 +141,11 @@ loginButton.addEventListener('click', function(e) {
       //  console.log(apiKey + ' ' + sessionId + ' ' + token);
         initializeSession();
       }).catch(handleError);
+      //console.log('afafa')
       socket.emit('join', data);
       return false
   }).catch((e) => {
-    console.log(e)
+    //console.log(e)
   })
   //return false;
 })
@@ -138,12 +155,33 @@ loginButton.addEventListener('click', function(e) {
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext('2d');
 ctx.canvas.width = 800;
+//ctx.canvas.background = "white"
 //ctx.fillStyle = "black";
 //ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 
 
 /////////socket
+
+class Powerup
+{
+  constructor(x, y, color)
+  {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+  }
+
+  draw()
+  {
+    if(this.visible)
+    {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, 20, 20);
+    }
+  }
+}
+Powerup.list = [];
 var Player = function(pack)
 {
   var self = {};
@@ -181,8 +219,9 @@ var Bullet = function(pack)
 
   self.draw = function()
   {
-    ctx.fillStyle = "black";//Bullet.list[i].color;
-    ctx.fillRect(self.x, self.y, 10, 10);
+    //console.log('dsaf')
+      ctx.fillStyle = "black";//Bullet.list[i].color;
+      ctx.fillRect(self.x, self.y, 10, 10);
   }
   Bullet.list[self.id] = self;
 
@@ -212,20 +251,46 @@ class Wall
 Wall.list = [];
 
 socket.on('walls', function(data) {
-  console.log(data);
+  //console.log(data);
   for(let i = 0; i <data.length; i++)
   {
     Wall.list.push(new Wall(data[i].x, data[i].y, data[i].w, data[i].h));
   }
 });
 
+socket.on('powerups', function(data) {
+//  console.log(data);
+  for(let i = 0; i < data.length; i++)
+  {
+    Powerup.list.push(new Powerup(data[i].x, data[i].y, data[i].color));
+  }
+});
+
+socket.on('updatePowerUp', function(data) {
+  for(let i = 0; i < data.length; i++)
+  {
+    Powerup.list[i].x = data[i].x;
+    Powerup.list[i].y = data[i].y;
+    Powerup.list[i].visible = data[i].visible;
+  }
+})
+
+let SCORE = [];
+let SCORE_MAP = {};
+//console.log(SCORE)
+
 socket.on('init', function(data) {
+  //console.log('adsfs')
+  SCORE = [];
+  //console.log(data)
   if(data.player.length !== 0)
   {
     //console.log(data);
   }
   for(let i = 0; i < data.player.length; i++)
   {
+    SCORE_MAP[data.player[i].score] = data.player[i].name;
+    SCORE.push(data.player[i].score)
     new Player(data.player[i]);
   }
 
@@ -233,9 +298,18 @@ socket.on('init', function(data) {
   {
     new Bullet(data.bullet[i]);
   }
+  SCORE.sort(function(a, b) {return b-a;})
+  for(let i = 0; i < SCORE.length; i++) {
+    let s = SCORE[i];
+    SCORE[i] = SCORE_MAP[SCORE[i]]
+    document.getElementById(`${i}`).innerHTML = `${SCORE[i]}: ${s}`;
+  }
+
+  //console.log(SCORE)
 });
 
 socket.on('update', function(data) {
+
   for(let i = 0; i < data.player.length; i++)
   {
     // if(data.player.length !== 0)
@@ -271,9 +345,17 @@ socket.on('update', function(data) {
 });
 
 socket.on('remove', function(data) {
+  if(data.player.length !== 0)
+  {
+    // console.log(data.player);
+    // console.log(Player.list);
+    // delete Player.list[data.player[i];
+    // console.log(Player.list);
+
+  }
   for(let i = 0; i < data.player.length; i++)
   {
-    delete Player.list[data.player[i].id];
+    delete Player.list[data.player[i]];
   }
 
   for(let i = 0; i < data.bullet.length; i++)
@@ -282,10 +364,29 @@ socket.on('remove', function(data) {
   }
 })
 
+  var sD = document.getElementById('scoreBoard');
+  for(let i = 0; i < 25; i++)
+  {
+    var d1 = document.createElement('div');
+    //d1.innerHTML = "some text";
+    d1.style.fontSize = "small"
+    d1.id = `${i}`;
+    d1.className = "ScoreElement"
+    //d1.color = 'blue';
+    sD.appendChild(d1)
+  }
+//var scoreB = document.getElementById("scoreBoard");
+//var ctx2 = scoreB.getContext('2d');
+//let ctx2 = scoreBoard.getContext('2d');
+
+
 setInterval(function () {
   // if(Player.list.length !== 0)
   //   console.log(Player.list);
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   for(var i in Player.list)
   {
     Player.list[i].draw();
@@ -300,6 +401,19 @@ setInterval(function () {
   {
     Wall.list[i].draw();
   }
+
+  for(var i in Powerup.list)
+  {
+    Powerup.list[i].draw();
+  }
+
+
+
+
+  // ctx2.clearRect(0, 0, scoreB.width, scoreB.height);
+  // ctx2.fillStyle = 'black';
+  // ctx2.font = "15px Verdana";
+  // ctx2.fillText('something', 40, 150);
 }, 40)
 
 // socket.on('updatedPositions', (data) => {
@@ -350,10 +464,12 @@ document.onmouseup = function(event) {
 document.onmousemove = function(event) {
   //var x = event.clientX;
   //var y = event.clientY;
+  //console.log(event.clientX + ' ' + event.clientY);
   var x = event.clientX - 8;//-250 + event.clientX - 8 + 221
-  var y = event.clientY - 221;//-250 + event.clientY - 8 + 7;
+  var y = event.clientY - 87;//-250 + event.clientY - 8 + 7;
   //console.log(x + ' ' + y);
   //var angle = Math.atan2(y,x) / Math.PI * 180;
   //console.log(angle);
   socket.emit('keyPress', {input: 'mouseAngle', state: {x, y}})
 }
+/////////////
