@@ -138,7 +138,7 @@ loginButton.addEventListener('click', function(e) {
         sessionId = res.sessionId;
         token = res.token;
       //  console.log(apiKey + ' ' + sessionId + ' ' + token);
-        //initializeSession();
+        initializeSession();
       }).catch(handleError);
       //console.log('afafa')
       socket.emit('join', data);
