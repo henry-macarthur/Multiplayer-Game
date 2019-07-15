@@ -129,23 +129,23 @@ loginButton.addEventListener('click', function(e) {
 
     //  initializeSession();
       console.log('inits')
-      var SERVER_BASE_URL = 'https://game-with-voicechat.herokuapp.com/';
-  //     fetch(SERVER_BASE_URL + '/session', {method: 'GET'}).then(function(res) {
-  //       //console.log(res)
-  //       return res.json()
-  //     }).then(function(res) {
-  //       apiKey = res.apiKey;
-  //       sessionId = res.sessionId;
-  //       token = res.token;
-  //     //  console.log(apiKey + ' ' + sessionId + ' ' + token);
-  //       initializeSession();
-  //     }).catch(handleError);
-  //     //console.log('afafa')
-  //     socket.emit('join', data);
-  //     return false
-  // }).catch((e) => {
-  //   //console.log(e)
-  // })
+      // var SERVER_BASE_URL = 'https://game-with-voicechat.herokuapp.com/';
+      // fetch(SERVER_BASE_URL + '/session', {method: 'GET'}).then(function(res) {
+      //   //console.log(res)
+      //   return res.json()
+      // }).then(function(res) {
+      //   apiKey = res.apiKey;
+      //   sessionId = res.sessionId;
+      //   token = res.token;
+      // //  console.log(apiKey + ' ' + sessionId + ' ' + token);
+      //   //initializeSession();
+      // }).catch(handleError);
+      //console.log('afafa')
+      socket.emit('join', data);
+      return false
+  }).catch((e) => {
+    //console.log(e)
+  })
   //return false;
 })
 
