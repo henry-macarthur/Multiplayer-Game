@@ -95,7 +95,7 @@ class Powerup
         var ii = Math.floor(Math.random() * 7);
         let location = LOCATIONS[ii];
         let count = 0;
-        while(location.i == 1 && count < 5)
+        while(location.i == 1 && count < 7)
         {
           console.log(count)
           ii = Math.floor(Math.random() * 7)
@@ -235,7 +235,7 @@ var Player = function (id, x, y, hp, score, name)
       {
         case 'shotgun':
         {
-          data.reloadTime = 350;
+          data.reloadTime = 250;
           break;
         }
         case 'damage':
@@ -269,8 +269,8 @@ var Player = function (id, x, y, hp, score, name)
       if(data.powerup === 'shotgun')
       {
         data.shootBullet(data.mouseAngle);
-        data.shootBullet(data.mouseAngle+20);
-        data.shootBullet(data.mouseAngle-20);
+        data.shootBullet(data.mouseAngle+15);
+        data.shootBullet(data.mouseAngle-15);
       }
       else
         data.shootBullet(data.mouseAngle);
