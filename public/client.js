@@ -1,6 +1,5 @@
 //console.log('running client');
-//'localhost:2000'
-var socket = io.connect('https://henry-online-game.herokuapp.com/');
+var socket = io.connect('https://henry-online-game.herokuapp.com/');//'localhost:2000');//
 //'http://localhost:2000')
 //////////LOGIN USER
 

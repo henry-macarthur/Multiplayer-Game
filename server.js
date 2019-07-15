@@ -241,7 +241,7 @@ var Player = function (id, x, y, hp, score, name)
         }
         case 'rapid':
         {
-          data.reloadTime = 800;
+          data.reloadTime = 80;
           break;
         }
       }
@@ -532,7 +532,7 @@ Bullet.update = function()
 
 
 var server = app.listen(port, () => {
-  needle.patch('https://henry-online-game.herokuapp.com/users/logoutAll');//`http://localhost:${port}/users/logoutAll`
+  needle.patch('https://henry-online-game.herokuapp.com/users/logoutAll');//`http://localhost:${port}/users/logoutAll`);//
   console.log('Server is running on port ' + port);
 });
 
@@ -579,6 +579,7 @@ io.on('connection', function(socket) {
         //`http://localhost:${port}/users/save/${name}`
         //http://localhost:${port}/users/save/${name}
         //`https://henry-online-game.herokuapp.com/users/save/${name}`
+        //`http://localhost:${port}/users/save/${name}`
         needle.patch(`https://henry-online-game.herokuapp.com/users/save/${name}`, update, {json: true}, function(err, resp) {
 
         });
