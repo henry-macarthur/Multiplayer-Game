@@ -95,7 +95,7 @@ class Powerup
         var ii = Math.floor(Math.random() * 7);
         let location = LOCATIONS[ii];
         let count = 0;
-        while(location.i == 1 )//&& count < 4)
+        while(location.i == 1 && count < 5)
         {
           console.log(count)
           ii = Math.floor(Math.random() * 7)
@@ -107,7 +107,10 @@ class Powerup
         for(let i = 0; i < LOCATIONS.length; i++)
         {
           if(LOCATIONS[i].x == this.x && LOCATIONS[i].y == this.y)
+          {
+            console.log('update')
             LOCATIONS[i].i == 0;
+          }
         }
 
         this.updateLocation(location.x, location.y);
