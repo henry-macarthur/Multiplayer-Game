@@ -92,12 +92,15 @@ class Powerup
         this.visible = false;
         this.time = Date.now();
       //
-        var i = Math.floor(Math.random() * 7);
-        let location = LOCATIONS[i];
-        while(location.i == 1)
+        var ii = Math.floor(Math.random() * 7);
+        let location = LOCATIONS[ii];
+        let count = 0;
+        while(location.i == 1 )//&& count < 4)
         {
-          i = Math.floor(Math.random() * 7)
-          location = LOCATIONS[i];
+          console.log(count)
+          ii = Math.floor(Math.random() * 7)
+          location = LOCATIONS[ii];
+          count ++;
         }
         LOCATIONS[i].i = 1;
 
