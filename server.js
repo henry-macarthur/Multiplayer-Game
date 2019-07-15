@@ -102,7 +102,7 @@ class Powerup
           location = LOCATIONS[ii];
           count ++;
         }
-        LOCATIONS[i].i = 1;
+        LOCATIONS[ii].i = 1;
 
         for(let i = 0; i < LOCATIONS.length; i++)
         {
