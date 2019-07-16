@@ -214,7 +214,7 @@ var Player = function (id, x, y, hp, score, name)
     for(let i = 0; i < Wall.list.length; i++)
     {
 
-      if(Wall.list[i].collide(data.x, data.y))
+      if(Wall.list[i].collide(data.x, data.y).collide)
       {
         if(data.up === true)
           data.y += 8;
@@ -275,6 +275,7 @@ var Player = function (id, x, y, hp, score, name)
       else
         data.shootBullet(data.mouseAngle);
 
+        //console.log(data.mouseAngle);
       for(var i in SOCKET_LIST)
       {
         let s = SOCKET_LIST[i];
@@ -416,17 +417,110 @@ Player.update = function()
 
 var Bullet = function(parent, angle)
 {
-  var self = createEntity(parent.x, parent.y)
+
+
+//  console.log(this.angle)
+  var self = createEntity(parent.x, parent.y);
+  self.angle = angle;
   self.id = Math.random();
   self.parent = parent;
   self.spd = 20;
-  self.spdX = -Math.cos(angle/180*Math.PI) * 20;
-  self.spdY = -Math.sin(angle/180*Math.PI) * 20;
+  self.spdX = -Math.cos(self.angle/180*Math.PI) * 20;
+  self.spdY = -Math.sin(self.angle/180*Math.PI) * 20;
   self.dmg = 5;
   self.timer = 0;
   self.remove = false;
   var super_update = self.update;
 
+  self.updateAngle = function (data)
+  {
+    // if(self.angle > 0)
+    //   self.angle += 90;
+    //console.log(self.angle);
+    //if(self.y > selfdd)
+    //self.spdX *= -1;
+
+    for(let i = 0; i < 4; i++)
+    {
+      let b = false;
+      switch(i)
+      {
+        case 0:
+        {
+          self.spdX *= -1;
+          // console.log(data);
+          // console.log(Wall.list[data.i])
+          //let c =
+          //console.log((3* Math.sign(self.spdX)));
+          if(!Wall.list[data.i].collide(self.x + (10* Math.sign(self.spdX)), self.y + (10* Math.sign(self.spdY))).collide)
+          {
+            // console.log(data)
+            // console.log(self.x + self.spdX, self.y + self.spdY)
+            b = true;
+            //console.log(self.spdY)
+          }
+          else {
+            self.spdX *= -1;
+          }
+          break;
+        }
+        case 1:
+        {
+          self.spdY *= -1;
+          //self.spdX *= -1
+          if(!checkCollide(!Wall.list[data.i].collide(self.x + (10* Math.sign(self.spdX)), self.y + (10* Math.sign(self.spdY))).collide))
+          {
+            b = true;
+          }
+          else {
+            self.spdY *= -1;
+            //self.spdX *= -1;
+          }
+          break;
+        }
+        case 2:
+        {
+          self.spdY *= -1;
+          self.spdX *= -1
+          if(!checkCollide(!Wall.list[data.i].collide(self.x + (10* Math.sign(self.spdX)), self.y + (10* Math.sign(self.spdY))).collide))
+          {
+            b = true;
+          }
+          else {
+            self.spdY *= -1;
+            self.spdX *= -1;
+          }
+          break;
+        }
+        case 3:
+        {
+          break;
+        }
+      }
+
+      if(b)
+        i = 6;
+    }
+
+
+
+    //console.log(self.angle);
+    // console.log(self.angle)
+    // if(self.angle >= 0)
+    //   self.angle *= -1;
+    // else if(self.angle < 0 && self.angle >= -90)
+    //   self.angle += 90;
+    // else
+    //   self.angle *= -1;//+= 90
+
+    //self.angle *= -1;//+= angle;
+    //self.updateSpd();
+    // self.x += self.spdX;
+    // self.y += self.spdY;
+    // console.log(self.angle);
+    //console.log(se)
+    //console.log(self.angle);
+  }
   self.update = function () {
     if(self.timer++ > 15)
     {
@@ -441,9 +535,9 @@ var Bullet = function(parent, angle)
       //console.log(p.addDmg)
       if(self.getDistance(p) < 30 && self.parent.id !== p.id)
       {
+          var shooter = Player.list[self.parent.id]
+        p.hp -= (self.dmg + self.parent.addDmg + self.parent.score);
 
-        p.hp -= (self.dmg + parent.addDmg);
-        var shooter = Player.list[self.parent.id]
 
         if(p.hp <= 0)
         {
@@ -460,6 +554,12 @@ var Bullet = function(parent, angle)
         self.remove = true;
       }
     }
+  }
+
+  self.updateSpd = function()
+  {
+    self.spdX = -Math.cos(self.angle/180*Math.PI) * 20;
+    self.spdY = -Math.sin(self.angle/180*Math.PI) * 20;
   }
 
   self.getInitPack = function ()
@@ -510,10 +610,15 @@ Bullet.update = function()
 
     for(let i = 0; i < Wall.list.length; i++)
     {
-      if(Wall.list[i].collide(bullet.x, bullet.y))
+      if(Wall.list[i].collide(bullet.x, bullet.y).collide)
       {
-        bullet.spdX  *= -1;
-        bullet.spdY *= -1;
+        bullet.updateAngle(Wall.list[i].collide(bullet.x, bullet.y));
+        //console.log(bullet.angle);
+        //bullet.angle += 90;
+      //  bullet.updateSpd();
+
+
+        //console.log(bullet.angle)
       }
     }
     if(bullet.remove)
@@ -584,7 +689,7 @@ io.on('connection', function(socket) {
         //https://henry-online-game.herokuapp.com/
         //`http://localhost:${port}/users/save/${name}`
         //http://localhost:${port}/users/save/${name}
-        //`https://henry-online-game.herokuapp.com/users/save/${name}`
+        //
         //`http://localhost:${port}/users/save/${name}`
         needle.patch(`https://henry-online-game.herokuapp.com/users/save/${name}`, update, {json: true}, function(err, resp) {
 
@@ -661,12 +766,13 @@ app.get('/', (req, res) => {
 /////////////
 class Wall
 {
-  constructor(x, y, w, h)
+  constructor(x, y, w, h, i)
   {
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
+    this.i = i;
   }
 
   collide(x, y)
@@ -678,14 +784,27 @@ class Wall
       || (x >= this.x && x <= this.x + this.w && y +20 >= this.y && y + 20<= this.y + this.h)){      // console.log(x + ' ' + y)
       // console.log(this);
       //console.log(y+20 + ' ' + this.y)
-      return true;
+      return {collide: true, x: this.x, y: this.y, w: this.w, h: this.h, i: this.i};
     }
-    return false;
+    return {collide: false};
   }
 }
 
-Wall.list = [new Wall(100, 0, 30, 300), new Wall(300, 150, 200, 30), new Wall(100, 300, 200, 30),
-new Wall(100, 400, 200, 30), new Wall(280, 100, 30, 200), new Wall(200, 50, 30, 200), new Wall(600, 100, 30, 300),
-new Wall(750, 100, 30, 300), new Wall(675, 400, 30, 100), new Wall(400, 400, 150, 30),
-new Wall(500, 0, 30, 100), new Wall(620, 300, 60, 30), new Wall(680, 200, 70, 30), new Wall(-18, 0, 20, 800),
-new Wall(0, -20, 900, 20), new Wall(0, 500, 800, 20), new Wall(800, 0, 20, 500)];
+checkCollide =  function(x1, y1, w, h, x, y)
+{
+  //console.log(x1, y1, w, h, x, y)
+  if( (x + 20 >= x1 && x + 20 <= x1 + w && y >= y1 && y <= y1 + h)
+    || (x  >= x1 && x <= x1 + w && y >= y1 && y <= y1 + h)
+    || (x + 20 >= x1 && x + 20 <= x1 + w && y + 20 >= y1 && y +20 <= y1 + h)
+    || (x >= x1 && x <= x1 + w && y +20 >= y1 && y + 20<= y1 + h)){
+      return true;
+    }
+
+    return false;
+}
+
+Wall.list = [new Wall(100, 0, 30, 300, 0), new Wall(300, 150, 200, 30, 1), new Wall(100, 300, 200, 30, 2),
+new Wall(100, 400, 200, 30, 3), new Wall(280, 100, 30, 200, 4), new Wall(200, 50, 30, 200, 5), new Wall(600, 100, 30, 300, 6),
+new Wall(750, 100, 30, 300, 7), new Wall(675, 400, 30, 100, 8), new Wall(400, 400, 150, 30, 9),
+new Wall(500, 0, 30, 100, 10), new Wall(620, 300, 60, 30, 11), new Wall(680, 200, 70, 30, 12), new Wall(-18, 0, 20, 800, 13),
+new Wall(0, -20, 900, 20, 14), new Wall(0, 500, 800, 20, 15), new Wall(800, 0, 20, 500, 16)];
