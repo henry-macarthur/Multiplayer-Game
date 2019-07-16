@@ -452,7 +452,8 @@ var Bullet = function(parent, angle)
           // console.log(Wall.list[data.i])
           //let c =
           //console.log((3* Math.sign(self.spdX)));
-          if(!Wall.list[data.i].collide(self.x + (10* Math.sign(self.spdX)), self.y + (10* Math.sign(self.spdY))).collide)
+          //console.log(self.spdX)
+          if(!Wall.list[data.i].collide(self.x + (20* Math.sign(self.spdX)), self.y + (15* Math.sign(self.spdY))).collide)
           {
             // console.log(data)
             // console.log(self.x + self.spdX, self.y + self.spdY)
@@ -468,6 +469,8 @@ var Bullet = function(parent, angle)
         {
           self.spdY *= -1;
           //self.spdX *= -1
+          let xx = self.spdX /20;
+          let yy = self.spdy /20
           if(!checkCollide(!Wall.list[data.i].collide(self.x + (10* Math.sign(self.spdX)), self.y + (10* Math.sign(self.spdY))).collide))
           {
             b = true;
@@ -643,7 +646,7 @@ Bullet.update = function()
 
 
 var server = app.listen(port, () => {
-  needle.patch('https://henry-online-game.herokuapp.com/users/logoutAll');//`http://localhost:${port}/users/logoutAll`);//
+  needle.patch(`http://localhost:${port}/users/logoutAll`);//'https://henry-online-game.herokuapp.com/users/logoutAll');//
   console.log('Server is running on port ' + port);
 });
 
@@ -689,9 +692,9 @@ io.on('connection', function(socket) {
         //https://henry-online-game.herokuapp.com/
         //`http://localhost:${port}/users/save/${name}`
         //http://localhost:${port}/users/save/${name}
-        //
+        //`https://henry-online-game.herokuapp.com/users/save/${name}`
         //`http://localhost:${port}/users/save/${name}`
-        needle.patch(`https://henry-online-game.herokuapp.com/users/save/${name}`, update, {json: true}, function(err, resp) {
+        needle.patch(`http://localhost:${port}/users/save/${name}`, update, {json: true}, function(err, resp) {
 
         });
 
